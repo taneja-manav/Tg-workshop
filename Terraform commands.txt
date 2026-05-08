@@ -217,3 +217,50 @@ yum:
 name: httpd
 state: present
 - name: Start web se
+
+
+
+
+
+
+
+---
+- name: Install packages, create users, and install nginx
+  hosts: all
+  become: yes
+
+  vars:
+    common_packages:
+      - telnet
+      - curl
+      - vim
+      - nginx
+
+    users_to_create:
+      - dev
+      - qa
+
+  tasks:
+
+    - name: Install required packages
+      package:
+        name: "{{ common_packages }}"
+        state: present
+
+    - name: Create users
+      user:
+        name: "{{ item }}"
+        state: present
+        create_home: yes
+        shell: /bin/bash
+      loop: "{{ users_to_create }}"
+
+    - name: Enable nginx service
+      service:
+        name: nginx
+        enabled: yes
+
+    - name: Start nginx service
+      service:
+        name: nginx
+        state: started
