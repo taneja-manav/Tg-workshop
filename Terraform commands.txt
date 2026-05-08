@@ -160,3 +160,40 @@ resource "aws_security_group" "ssh_sg" {
     }
   )
 }
+
+
+
+
+
+
+variables.tf:
+
+variable "bucket_name" {
+  default = "deepak-bucket-tf"
+}
+
+variable "instance_type" {
+  default = "t4g.nano"
+}
+
+variable "vpc_id" {
+  default = "vpc-0b3a73d0d1a99e3e2"
+}
+
+
+variable "ami_id" {
+  default = "ami-06043e7ebe7d39ab7"
+}
+
+variable "common_tags" {
+
+  type = map(string)
+
+  default = {
+
+    Environment = "testing"
+    team = "chitkara"
+
+  }
+
+}
