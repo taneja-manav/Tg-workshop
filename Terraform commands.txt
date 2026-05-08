@@ -1,0 +1,107 @@
+providers.tf:
+
+terraform {
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 6.0"
+    }
+  }
+}
+
+# Configure the AWS Provider
+provider "aws" {
+  region = "us-east-1"
+}
+
+
+
+
+
+main.tf:
+
+resource "aws_s3_bucket" "deepak-bucket-tf" {
+  bucket = var.bucket_name
+
+  tags = {
+    Environment = "testing"
+    team        = "chitkara"
+  }
+}
+
+resource "aws_instance" "test1-ec2" {
+  subnet_id = "subnet-0c7498e26521dc519"
+  ami           = var.ami_id
+  instance_type = var.instance_type
+
+  tags = {
+    Name        = "test-ec2"
+    Environment = "testing"
+  }
+}
+
+variable.tf:
+
+variable "bucket_name" {
+  default = "deepak-bucket-tf"
+}
+
+variable "instance_type" {
+  default = "t4g.nano"
+ }
+
+ variable "ami_id" {
+   default = "ami-06043e7ebe7d39ab7"
+ }
+
+
+
+resource "aws_security_group" "ssh_sg" {
+  name        = "allow_ssh"
+  description = "Allow SSH access"
+
+  ingress {
+    description = "SSH access"
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = merge(
+    var.common_tags,
+    {
+      Name = "ssh-security-group"
+    }
+  )
+}
+
+
+variable "common_tags" {
+
+  type = map(string)
+
+  default = {
+
+    Environment = "dev"
+
+    Owner       = "student"
+
+    Project     = "terraform-workshop"
+
+  }
+
+}
+
+
+
+
+
+vpc_security_group_ids = [aws_security_group.ssh_sg.id]
